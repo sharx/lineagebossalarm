@@ -82,11 +82,11 @@ DATABASES = {
     #}
     #use this for external postgres url from render.com
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'lineagedb',
         'USER': 'lineage',
         'PASSWORD': 'z2rYptjMQhiBIuVU5OhDExxtmtHuhyHa',
-        'HOST': 'z2rYptjMQhiBIuVU5OhDExxtmtHuhyHa@dpg-cscjaiaj1k6c7396q8g0-a.oregon-postgres.render.com',
+        'HOST': 'dpg-cscjaiaj1k6c7396q8g0-a.oregon-postgres.render.com',
         'PORT': '5432',
     }
     #use this for intermal postgres url from render.com
