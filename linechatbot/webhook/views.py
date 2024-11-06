@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+import requests
 # Create your views here.
 import base64
 import hashlib
@@ -16,8 +16,8 @@ def webhook(request):
         request.headers['X-Line-Signature']
 
         # Request body string
-        body = request.body
-        hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
+        body = request.body.decode('utf-8')
+        hash = hmac.new(channel_secret.encode('utf-8'), request.body, hashlib.sha256).digest()
         signature = base64.b64encode(hash)
         if signature == request.headers['X-Line-Signature']:
             print('=============Log=============\nSignature is valid')
