@@ -12,6 +12,7 @@ channel_id = '2006537537' # Channel ID string
 def webhook(request):
     if request.method == 'POST':
         request.headers['X-Line-Signature']
+        raise Exception(f"=============Log============={request.headers['X-Line-Signature']}")
         # Request body string
         body = request.body
         hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
