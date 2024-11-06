@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+# Import dj-database-url at the beginning of the file.
+import dj_database_url
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -47,6 +49,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #add this for renderer.com to serve static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'linechatbot.urls'
@@ -80,15 +84,21 @@ DATABASES = {
     #    'ENGINE': 'django.db.backends.sqlite3',
     #    'NAME': BASE_DIR / 'db.sqlite3',
     #}
+    #use this for renderer internal postgres url
+    'default': dj_database_url.config(
+        # Replace this value with your local database's connection string.
+        default='postgresql://lineage:z2rYptjMQhiBIuVU5OhDExxtmtHuhyHa@dpg-cscjaiaj1k6c7396q8g0-a/lineagedb',
+        conn_max_age=600
+    )
     #use this for external postgres url from render.com
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'lineagedb',
-        'USER': 'lineage',
-        'PASSWORD': 'z2rYptjMQhiBIuVU5OhDExxtmtHuhyHa',
-        'HOST': 'dpg-cscjaiaj1k6c7396q8g0-a.oregon-postgres.render.com',
-        'PORT': '5432',
-    }
+    #'default': {
+    #    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #    'NAME': 'lineagedb',
+    #    'USER': 'lineage',
+    #    'PASSWORD': 'z2rYptjMQhiBIuVU5OhDExxtmtHuhyHa',
+    #    'HOST': 'dpg-cscjaiaj1k6c7396q8g0-a.oregon-postgres.render.com',
+    #    'PORT': '5432',
+    #}
     #use this for intermal postgres url from render.com
     #'default': {
     #    'ENGINE': 'django.db.backends.postgresql',
@@ -136,7 +146,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# This setting informs Django of the URI path from which your static files will be served to users
+# Here, they well be accessible at your-domain.onrender.com/static/... or yourcustomdomain.com/static/...
+STATIC_URL = '/static/'
+
+# This production code might break development mode, so we check whether we're in DEBUG mode
+if not DEBUG:
+    # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
+    # and renames the files with unique names for each version to support long-term caching
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
