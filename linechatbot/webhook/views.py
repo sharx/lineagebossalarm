@@ -24,3 +24,6 @@ def webhook(request):
 
         #return a json response, status code 200
         return JsonResponse({'status': 'true'}, status=200)
+    else:
+        #return a json response, status code 405
+        return JsonResponse({'status': 'false'}, status=405)

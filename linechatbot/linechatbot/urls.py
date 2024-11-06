@@ -20,5 +20,5 @@ from webhook.views import webhook
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('linebot-inbound/', webhook),
+    path('webhook/', webhook),
 ]
