@@ -22,6 +22,9 @@ def webhook(request):
             print('=============Log=============\nSignature is valid')
         else:
             print('=============Log=============\nSignature is invalid')
+            print('Signature: ', request.headers['X-Line-Signature'] )
+            print('body: \n', body)
+
         
 
         #return a json response, status code 200
