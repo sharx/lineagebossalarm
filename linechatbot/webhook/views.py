@@ -9,10 +9,11 @@ from django.http import JsonResponse
 channel_secret = '2f97d3e3a877f6d13a8407793fa1caf5' # Channel secret string
 channel_id = '2006537537' # Channel ID string
 
+@csrf_exempt
 def webhook(request):
     if request.method == 'POST':
         request.headers['X-Line-Signature']
-        raise Exception(f"=============Log============={request.headers['X-Line-Signature']}")
+
         # Request body string
         body = request.body
         hash = hmac.new(channel_secret.encode('utf-8'), body.encode('utf-8'), hashlib.sha256).digest()
