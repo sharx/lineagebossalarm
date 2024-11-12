@@ -6,6 +6,7 @@ import hmac
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+#submit on mac
 channel_secret = '2f97d3e3a877f6d13a8407793fa1caf5' # Channel secret string
 channel_id = '2006537537' # Channel ID string
 access_token = 'QbASYEKbRgwRXr5PbEXyBw4L/J9UASMbFpYnTSj3q2e6PBo0HhULDq9ZbToYuRG79xuwcmXSmsDZCcNi1z0HB0nQ1UVV8jaaQnRO6SphCfvlWxZ5JyjFu22YMXiv4yobgX4fGqUqRkZyWe9Sq0qP5wdB04t89/1O/w1cDnyilFU='
