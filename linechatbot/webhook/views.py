@@ -6,12 +6,15 @@ import base64
 import hashlib
 import hmac
 import requests
+from bs4 import BeautifulSoup as bs
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q, F
 from .models import Boss, LineGroup, KillRecord
+from .scraper import linwGoodsSearch
 from pprint import pprint
+
 from linebot.v3 import (
     WebhookHandler
 )
@@ -304,6 +307,33 @@ def handle_message(event):
                 )
             )
             pass
+        elif re.match(r'^查詢物價', text):
+            if re.match(r'^查詢物價 [\u4e00-\u9fa5]+$', text):
+                searchResult = linwGoodsSearch(text.split(' ')[1], None, "0,+5,+7,+9")
+                #data example: [{"id":66738139,"linwGoodsSearchId":186982,"gameServerId":10000,"gameServerName":"潘朵拉","gameItemKey":913376,"gameItemName":"冰之女王之淚","gameItemQuantity":1,"salePrice":260,"unitPrice":260.0000,"effectiveTo":"2일 15시간","displayData":"{\"sellerWorldNo\":115}","gameItemConditions":[{"key":"EnchantLevel","type":"1","value":"0"},...]
+                #find the lowest "unitPrice" and return the "gameServerName" and "unitPrice"
+                if searchResult["status_code"] == 200 and searchResult["data_count"] > 0:
+                    data = searchResult["data"]
+                    lowest_price = data[0]
+                    for item in data:
+                        if item["unitPrice"] < lowest_price["unitPrice"]:
+                            lowest_price = item
+                    line_bot_api = MessagingApi(api_client)
+                    line_bot_api.reply_message_with_http_info(
+                        ReplyMessageRequest(
+                            reply_token=event.reply_token,
+                            messages=[TextMessage(text=f'最低價格：\n伺服器：{lowest_price["gameServerName"]} \n單位價格：{lowest_price["unitPrice"]}')]
+                        )
+                    )
+                else:
+                    err_msg = searchResult["status_text"]
+                    line_bot_api = MessagingApi(api_client)
+                    line_bot_api.reply_message_with_http_info(
+                        ReplyMessageRequest(
+                            reply_token=event.reply_token,
+                            messages=[TextMessage(text=err_msg)]
+                        )
+                    )
         else:
             print('=============Log=============\nMessage text is empty')
             #return a json response, status code 200
