@@ -238,8 +238,9 @@ def handle_message(event):
                         kill_record, created = KillRecord.objects.get_or_create(boss=boss, line_group=LineGroup.objects.get_or_create(group_id=groupId))
                     except Exception as e:
                         print('=============Log=============\nError:')
-                        print("event:")
-                        pprint(event)
+                        print("groupId: %s"%groupId)
+                        print("event.source: ")
+                        pprint(event.source)
                         return JsonResponse({'status': 'false'}, status=405)
                     if created:
                         print('=============Log=============\nKill record created\nBoss: %s\nGroup: %s', boss.boss_name, groupId)
