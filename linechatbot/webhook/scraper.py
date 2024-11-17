@@ -13,7 +13,7 @@ def getLinwServers():
     if response.status_code == 200:
         #request success
         for server in data["data"]:
-            servers.append({"serverID": server["gameServerId"], "serverName": server["gameServerName"]})
+            servers.append({"serverID": str(server["gameServerId"]), "serverName": server["gameServerName"]})
         return servers
     else:
         #error
@@ -29,7 +29,7 @@ def getLinwItems():
     if response.status_code == 200:
         #request success
         for item in data["data"]:
-            items.append({"itemID": item["gameItemId"], "itemName": item["gameItemName"]})
+            items.append({"itemID": str(item["gameItemId"]), "itemName": item["gameItemName"]})
         return items
     else:
         #error
