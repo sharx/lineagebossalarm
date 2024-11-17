@@ -37,18 +37,21 @@ def getLinwItems():
         print(f"Error code: {response.status_code} : {data['message']}")
         return None
 
-def linwGoodsSearch(gameItemName, serverId, enchantValues):
+def linwGoodsSearch(gameItemName, enchantValues):
     serverIds = getLinwServers()
-    if serverIds and any(serverId in s["serverID"] for s in serverIds):
+    """if serverIds:
+        if any(serverId in s["serverID"] for s in serverIds):
         #if serverId is in the serverIds.serverID
-        serverId = serverId
-    elif serverIds and not any(serverId in s["serverID"] for s in serverIds):
+            serverId = serverId
+        else:
+
         #serverId is not in the serverIds.serverID
         return { "status_code": 500, "status_text": "錯誤: 物價網站無法連線" }
     else:
         #serverIds is empty
         serverId = "99999"
-
+    """
+    serverId = "99999"
     itemIds = getLinwItems()
     if itemIds and any(gameItemID in i["itemID"] for i in itemIds):
         #if gameItemID is in the itemIds.itemID
