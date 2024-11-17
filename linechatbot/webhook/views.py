@@ -220,9 +220,7 @@ def getBoss(boss_name):
 def processRegisterKillTime(request_kill_time):
     #if the text in the body is in text format and as format 'k boss_name time(mmss)', then add the boss name and kill time to the database
     if request_kill_time and request_kill_time != "":
-        print('=============Log=============\nrequest_kill_time[0:1]: ', request_kill_time[0:2])
         mm = int(request_kill_time[0:2])
-        print('=============Log=============\nrequest_kill_time[2:3]: ', request_kill_time[2:4])
         ss = int(request_kill_time[2:4])
         #if kill_time is in the format 'mmss', mm is minute, ss is second, 0 < mm < 24, 0 < ss < 60. if true, then add the kill record
         if mm <24 and mm>=0 and ss < 60 and ss >= 0:
@@ -233,12 +231,12 @@ def processRegisterKillTime(request_kill_time):
         else:
             #kill time is not in the correct format, ignore the message
             print('=============Log=============\nKill time is not in the correct format. Received: ', request_kill_time)
-            print("MM SS: ", mm, ss)
+            print(f"MM SS: {mm} {ss}")
             kill_time = None
     else:
         #reqeust_kill_time is none, kill_time is now and replace second and microsecond to 0
         kill_time = datetime.now().replace(second=0, microsecond=0)
-        return kill_time
+    return kill_time
 
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
@@ -264,7 +262,6 @@ def handle_message(event):
             if kill_time:
                 respond_time = kill_time + timedelta(hours=boss.respond_duration)
             else:
-                print('=============Log=============\nKill time is not in the correct format. Received: ', request_kill_time)
                 return JsonResponse({'status': 'false'}, status=405)
             
             line_group, created =LineGroup.objects.get_or_create(group_id=groupId)
