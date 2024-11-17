@@ -29,7 +29,7 @@ def getLinwItems():
     if response.status_code == 200:
         #request success
         for item in data["data"]:
-            items.append({"itemID": str(item["gameItemId"]), "itemName": item["gameItemName"]})
+            items.append({"itemID": str(item["id"]), "itemName": item["gameItemName"]})
         return items
     else:
         #error
@@ -52,11 +52,11 @@ def linwGoodsSearch(gameItemName, enchantValues):
         serverId = "99999"
     """
     serverId = "99999"
-    itemIds = getLinwItems()
-    if itemIds and any(gameItemID in i["itemID"] for i in itemIds):
+    items = getLinwItems()
+    if items and any(gameItemName in i["itemName"] for i in items):
         #if gameItemID is in the itemIds.itemID
-        gameItemID = gameItemID
-    elif itemIds and not any(gameItemID in i["itemID"] for i in itemIds):
+        gameItemName = gameItemName
+    elif items and not any(gameItemName in i["itemName"] for i in items):
         #gameItemID is not in the itemIds.itemID
         return { "status_code": 500, "status_text": f"錯誤: 找不到物品名稱 {gameItemName}" }
     else:
