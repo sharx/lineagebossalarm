@@ -188,7 +188,7 @@ def webhook(request):
     signature = request.headers['X-Line-Signature']
 
     # get request body as text
-    body = request.get_data(as_text=True)
+    body = request.body.decode('utf-8')
 
     # handle webhook body
     try:
