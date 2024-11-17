@@ -243,10 +243,10 @@ def handle_message(event):
     with ApiClient(configuration) as api_client:
         text = event.message.text
         groupId = event.source.group_id
-        if text != "":
-            print('=============Log=============\nMessage received')
+        if re.match(r'^k', text):
+            print('=============Log=============\nK Message received')
             #if the text is in the format 'k boss_name time(mmss)', then add the boss name and kill time to the database
-            if re.match(r'^k [\u4e00-\u9fa5]+ \d{4}$', text):
+            if re.match(r'^k [\u4e00-\u9fa5]+ \d{4}$', text) or re.match(r'^k \S+ \d{4}$', text):
                 #get the boss name and kill time
                 request_kill_time = text.split(' ')[2]
                 boss = getBoss(text.split(' ')[1])
@@ -281,8 +281,29 @@ def handle_message(event):
                     messages=[TextMessage(text='擊殺%s，將在%s重生，重生3分鐘前通知' % (boss.boss_name, respond_time.strftime("%H:%M")))]
                 )
             )
-            
-                
+        elif re.match(r'^新增首領', text):
+            print('=============Log=============\nAdd Message received')
+            #if the text is in the format 'add boss_name', then add the boss name and respond_duration to the database
+            if len(text.split(' ')) == 3:
+                boss_str = text.split(' ')[1]
+                respond_duration = int(text.split(' ')[2])
+
+            else:
+                print('=============Log=============\nMessage text is not in the correct format')
+                print('Message text: ', text)
+                return JsonResponse({'status': 'false'}, status=405)
+        elif text == '時刻表':
+            print('=============Log=============\nMenu request received')
+            #if the text is '時刻表', then return the help message
+            help_message = '時刻表指令\n-登記擊殺時間：k 首領名稱(可簡稱) xxyy(小時分鐘) - 註冊擊殺時間\n範例：k 麥肯 2138\n\n-註冊首領屬性：\n新增首領 首領名稱,簡稱(可多個) 重生時間 - 新增首領名稱及重生時間\n範例：\n新增首領 飛龍3,龍3,3 4\n\n時刻表 - 顯示此訊息'
+            line_bot_api = MessagingApi(api_client)
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[TextMessage(text=help_message)]
+                )
+            )
+            pass
         else:
             print('=============Log=============\nMessage text is empty')
             #return a json response, status code 200
