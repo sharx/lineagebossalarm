@@ -241,11 +241,12 @@ def handle_message(event):
                         kill_record.responds_time = respond_time
                         kill_record.save()
                         print('=============Log=============\nKill record updated\nBoss: %s\nGroup: %s\nRespond time: %s'(boss.boss_name, groupId, respond_time.strftime("%Y-%m-%d %H:%M")) )
+                    
                     line_bot_api = MessagingApi(api_client)
                     line_bot_api.reply_message_with_http_info(
                         ReplyMessageRequest(
                             reply_token=event.reply_token,
-                            messages=[TextMessage(text=event.message.text)]
+                            messages=[TextMessage(text='擊殺%s，將在%s重生，重生3分鐘前通知' % (boss.boss_name, respond_time.strftime("%H:%M")))]
                         )
                     )
                 else:
