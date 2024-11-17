@@ -309,6 +309,7 @@ def handle_message(event):
             pass
         elif re.match(r'^查詢物價', text):
             if re.match(r'^查詢物價 [\u4e00-\u9fa5]+$', text):
+                print(f'=============Log=============\nSearch item message received: {text}')
                 searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9")
                 #data example: [{"id":66738139,"linwGoodsSearchId":186982,"gameServerId":10000,"gameServerName":"潘朵拉","gameItemKey":913376,"gameItemName":"冰之女王之淚","gameItemQuantity":1,"salePrice":260,"unitPrice":260.0000,"effectiveTo":"2일 15시간","displayData":"{\"sellerWorldNo\":115}","gameItemConditions":[{"key":"EnchantLevel","type":"1","value":"0"},...]
                 #find the lowest "unitPrice" and return the "gameServerName" and "unitPrice"
