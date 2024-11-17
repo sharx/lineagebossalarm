@@ -268,11 +268,11 @@ def handle_message(event):
             kill_record, created = KillRecord.objects.get_or_create(boss=boss, line_group = line_group)
             
             if created:
-                print('=============Log=============\nKill record created\nBoss: %s\nGroup: %s', boss.boss_name, groupId)
+                print(f'=============Log=============\nKill record created\nBoss: {boss.boss_name}\nGroup: {groupId}')
             else:
                 kill_record.responds_time = respond_time
                 kill_record.save()
-                print('=============Log=============\nKill record updated\nBoss: %s\nGroup: %s\nRespond time: %s'(boss.boss_name, groupId, respond_time) )
+                print(f'=============Log=============\nKill record updated\nBoss: {boss.boss_name}\nGroup: {groupId}\nRespond time: {respond_time}' )
             
             line_bot_api = MessagingApi(api_client)
             line_bot_api.reply_message_with_http_info(
