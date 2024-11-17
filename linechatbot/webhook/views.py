@@ -313,7 +313,7 @@ def handle_message(event):
                 searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9")
                 #data example: [{"id":66738139,"linwGoodsSearchId":186982,"gameServerId":10000,"gameServerName":"潘朵拉","gameItemKey":913376,"gameItemName":"冰之女王之淚","gameItemQuantity":1,"salePrice":260,"unitPrice":260.0000,"effectiveTo":"2일 15시간","displayData":"{\"sellerWorldNo\":115}","gameItemConditions":[{"key":"EnchantLevel","type":"1","value":"0"},...]
                 #find the lowest "unitPrice" and return the "gameServerName" and "unitPrice"
-                if searchResult["status_code"] == 200 and searchResult["data_count"] > 0:
+                if searchResult["status_text"] == "查詢成功":
                     data = searchResult["data"]
                     lowest_price = data[0]
                     for item in data:
