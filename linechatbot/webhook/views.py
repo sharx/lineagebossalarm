@@ -202,10 +202,60 @@ def webhook(request):
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
     with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
-        line_bot_api.reply_message_with_http_info(
-            ReplyMessageRequest(
-                reply_token=event.reply_token,
-                messages=[TextMessage(text=event.message.text)]
-            )
-        )
+        text = event.message.text
+        groupId = event.source.group_id
+        if text != "":
+            print('=============Log=============\nMessage received')
+            #if the text is in the format 'k boss_name time(mmss)', then add the boss name and kill time to the database
+            if re.match(r'^k \s+ \d{4}$', text):
+                #get the boss name and kill time
+                boss_name = text.split(' ')[1]
+                kill_time = text.split(' ')[2]
+                #get the boss object. if boss_name in Boss.boss_name or in Boss.slug.split(';'), then get the boss object
+                #boss.slug example: 'boss1;boss2;boss3'
+                #query the boss object if boss_name exactly match the list elements in boss.slug.split(';')
+                boss_first_match = Boss.objects.filter(slug__contains=boss_name)
+                if boss_first_match.count() == 0:
+                    #no boss name match, ignore the message
+                    print('=============Log=============\nNo boss name match')
+                    boss = None
+                elif boss_first_match.count() == 1:
+                    #boss match only one, add the kill record
+                    boss = boss_first_match[0]
+                else:
+                    #boss match more than one, boss_name must match the slug.split(";") exactly
+                    for ele in boss_first_match:
+                        if boss_name in boss.slug.split(';'):
+                            boss = ele
+
+                #if kill_time is in the format 'mmss', mm is minute, ss is second, 0 < mm < 24, 0 < ss < 60. if true, then add the kill record
+                mm = int(kill_time[0:2])
+                ss = int(kill_time[2:4])
+                if mm <24 and mm>=0 and ss < 60 and ss >= 0:
+                    kill_time = datetime.now().replace(hour=mm, minute=ss, second=0, microsecond=0)
+                    respond_time = kill_time + timedelta(hours=boss.respond_duration)
+                    kill_record, created = KillRecord.objects.get_or_create(boss=boss, line_group=LineGroup.objects.get_or_create(group_id=groupId))
+                    if created:
+                        print('=============Log=============\nKill record created\nBoss: %s\nGroup: %s', boss.boss_name, groupId)
+                    else:
+                        kill_record.responds_time = respond_time
+                        kill_record.save()
+                        print('=============Log=============\nKill record updated\nBoss: %s\nGroup: %s\nRespond time: %s'(boss.boss_name, groupId, respond_time.strftime("%Y-%m-%d %H:%M")) )
+                    line_bot_api = MessagingApi(api_client)
+                    line_bot_api.reply_message_with_http_info(
+                        ReplyMessageRequest(
+                            reply_token=event.reply_token,
+                            messages=[TextMessage(text=event.message.text)]
+                        )
+                    )
+                else:
+                    #kill time is not in the correct format, ignore the message
+                    print('=============Log=============\nKill time is not in the correct format. Received: ', kill_time)
+            else:
+                print('=============Log=============\nMessage text is not in the correct format')
+                
+        else:
+            print('=============Log=============\nMessage text is empty')
+            #return a json response, status code 200
+            return JsonResponse({'status': 'true'}, status=200)
+        
