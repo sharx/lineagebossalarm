@@ -207,7 +207,7 @@ def handle_message(event):
         if text != "":
             print('=============Log=============\nMessage received')
             #if the text is in the format 'k boss_name time(mmss)', then add the boss name and kill time to the database
-            if re.match(r'^k \s+ \d{4}$', text):
+            if re.match(r'^k [\u4e00-\u9fa5]+ \d{4}$', text):
                 #get the boss name and kill time
                 boss_name = text.split(' ')[1]
                 kill_time = text.split(' ')[2]
@@ -254,6 +254,7 @@ def handle_message(event):
                     print('=============Log=============\nKill time is not in the correct format. Received: ', kill_time)
             else:
                 print('=============Log=============\nMessage text is not in the correct format')
+                print('Message text: ', text)
                 
         else:
             print('=============Log=============\nMessage text is empty')
