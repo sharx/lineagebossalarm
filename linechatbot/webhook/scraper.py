@@ -53,10 +53,11 @@ def linwGoodsSearch(gameItemName, enchantValues):
     """
     serverId = "99999"
     items = getLinwItems()
-    if items and any(gameItemName in i["itemName"] for i in items):
+    match_list = [i["itemID"] for i in items if gameItemName in i["itemName"]]
+    if items and match_list:
         #if gameItemID is in the itemIds.itemID
-        gameItemID = items["itemID"]
-    elif items and not any(gameItemName in i["itemName"] for i in items):
+        gameItemID = match_list[0]
+    elif items and len(match_list)==0:
         #gameItemID is not in the itemIds.itemID
         return { "status_code": 500, "status_text": f"錯誤: 找不到物品名稱 {gameItemName}" }
     else:
