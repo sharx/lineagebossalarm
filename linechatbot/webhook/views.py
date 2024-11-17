@@ -11,7 +11,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q, F
 from .models import Boss, LineGroup, KillRecord
-
+from pprint import pprint
 from linebot.v3 import (
     WebhookHandler
 )
@@ -234,7 +234,13 @@ def handle_message(event):
                 if mm <24 and mm>=0 and ss < 60 and ss >= 0:
                     kill_time = datetime.now().replace(hour=mm, minute=ss, second=0, microsecond=0)
                     respond_time = kill_time + timedelta(hours=boss.respond_duration)
-                    kill_record, created = KillRecord.objects.get_or_create(boss=boss, line_group=LineGroup.objects.get_or_create(group_id=groupId))
+                    try:
+                        kill_record, created = KillRecord.objects.get_or_create(boss=boss, line_group=LineGroup.objects.get_or_create(group_id=groupId))
+                    except Exception as e:
+                        print('=============Log=============\nError:')
+                        print("event:")
+                        pprint(event)
+                        return JsonResponse({'status': 'false'}, status=405)
                     if created:
                         print('=============Log=============\nKill record created\nBoss: %s\nGroup: %s', boss.boss_name, groupId)
                     else:
