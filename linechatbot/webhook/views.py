@@ -251,9 +251,8 @@ def handle_message(event):
                 boss = getBoss(text.split(' ')[1])
                 kill_time = processRegisterKillTime(text.split(' ')[2])
             elif re.match(r'^k [\u4e00-\u9fa5]+$', text):
-                request_kill_time = text.split(' ')[2]
                 boss = getBoss(text.split(' ')[1])
-                kill_time = processRegisterKillTime(text.split(' ')[2])
+                kill_time = processRegisterKillTime(None)
             else:
                 print('=============Log=============\nMessage text is not in the correct format')
                 print('Message text: ', text)
