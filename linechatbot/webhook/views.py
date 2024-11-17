@@ -251,7 +251,7 @@ def handle_message(event):
                 request_kill_time = text.split(' ')[2]
                 boss = getBoss(text.split(' ')[1])
                 kill_time = processRegisterKillTime(text.split(' ')[2])
-            elif re.match(r'^k [\u4e00-\u9fa5]+$', text):
+            elif re.match(r'^k [\u4e00-\u9fa5]+$', text) or re.match(r'^k \S+$', text):
                 boss = getBoss(text.split(' ')[1])
                 kill_time = processRegisterKillTime(None)
             else:
