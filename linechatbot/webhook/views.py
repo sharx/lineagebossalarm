@@ -213,7 +213,7 @@ def getBoss(boss_name):
     else:
         #boss match more than one, boss_name must match the slug.split(";") exactly
         for ele in boss_first_match:
-            if boss_name in boss.slug.split(';'):
+            if boss_name in ele.slug.split(';'):
                 boss = ele
     return boss
 
@@ -231,6 +231,7 @@ def processRegisterKillTime(request_kill_time):
         else:
             #kill time is not in the correct format, ignore the message
             print('=============Log=============\nKill time is not in the correct format. Received: ', request_kill_time)
+            print("MM SS: ", mm, ss)
             kill_time = None
     else:
         #reqeust_kill_time is none, kill_time is now and replace second and microsecond to 0
