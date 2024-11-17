@@ -234,14 +234,10 @@ def handle_message(event):
                 if mm <24 and mm>=0 and ss < 60 and ss >= 0:
                     kill_time = datetime.now().replace(hour=mm, minute=ss, second=0, microsecond=0)
                     respond_time = kill_time + timedelta(hours=boss.respond_duration)
-                    try:
-                        kill_record, created = KillRecord.objects.get_or_create(boss=boss, line_group=LineGroup.objects.get_or_create(group_id=groupId))
-                    except Exception as e:
-                        print('=============Log=============\nError:')
-                        print("groupId: %s"%groupId)
-                        print("event.source: ")
-                        pprint(event.source)
-                        return JsonResponse({'status': 'false'}, status=405)
+                    
+                    line_group, created =LineGroup.objects.get_or_create(group_id=groupId)
+                    kill_record, created = KillRecord.objects.get_or_create(boss=boss, line_group = line_group)
+                    
                     if created:
                         print('=============Log=============\nKill record created\nBoss: %s\nGroup: %s', boss.boss_name, groupId)
                     else:
