@@ -41,6 +41,7 @@ def linwGoodsSearch(gameItemName, enchantValues, serverName):
     if serverName != "":
         servers = getLinwServers()
         serverId = [i["serverID"] for i in servers if serverName == i["serverName"]][0]
+        print(f"Sever name {serverName} in incoming text. Get serverId: {serverId}")
     else:
         #serverIds is empty
         serverId = "99999"
@@ -78,4 +79,4 @@ def linwGoodsSearch(gameItemName, enchantValues, serverName):
     else:
         #unknown error
         print("Error: Unknown error")
-        return { "status_code": response.status_code, "status_text": data["message"] }
+        return { "status_code": response.status_code, "status_text": data["message"] if data["message"] else str(data) }
