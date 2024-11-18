@@ -42,12 +42,14 @@ def linwGoodsSearch(gameItemName, enchantValues, serverName):
         servers = getLinwServers()
         if any([i["serverID"] for i in servers if serverName == i["serverName"]]):
             print(f"Sever name {serverName} valid")
+            server_valid = True
         else:
             print(f"Sever name {serverName} invalid")
             return { "status_code": 303, "status_text": f"錯誤: 找不到伺服器名稱 {serverName}" }
     else:
         #serverIds is empty
         print("Sever name is empty")
+        server_valid = False
     
     serverId = "99999"
     
@@ -78,7 +80,8 @@ def linwGoodsSearch(gameItemName, enchantValues, serverName):
         else:
             #search success, and there are items on the shelf
             #replace the data["data"]["content"] with the items that match the serverName
-            data["data"]["content"] = [items for items in data["data"]["content"] if items["gameServerName"] == serverName]
+            if server_valid:
+                data["data"]["content"] = [items for items in data["data"]["content"] if items["gameServerName"] == serverName]
             return { "status_code": response.status_code, "status_text": "查詢成功", "data_count": len(data["data"]["content"]), "data": data["data"]["content"] }
         
     elif response.status_code == 429:
