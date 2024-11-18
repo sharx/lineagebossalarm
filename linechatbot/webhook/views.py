@@ -311,19 +311,19 @@ def handle_message(event):
             if re.match(r'^查詢物價 [\u4e00-\u9fa5]+$', text):
                 print(f'=============Log=============\nSearch item message received: {text}')
                 searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9")
-                #data example: [{"id":66738139,"linwGoodsSearchId":186982,"gameServerId":10000,"gameServerName":"潘朵拉","gameItemKey":913376,"gameItemName":"冰之女王之淚","gameItemQuantity":1,"salePrice":260,"unitPrice":260.0000,"effectiveTo":"2일 15시간","displayData":"{\"sellerWorldNo\":115}","gameItemConditions":[{"key":"EnchantLevel","type":"1","value":"0"},...]
                 #find the lowest "unitPrice" and return the "gameServerName" and "unitPrice"
                 if searchResult["status_text"] == "查詢成功":
                     data = searchResult["data"]
-                    lowest_price = data[0]
+                    lowest_price_item = data[0]
                     for item in data:
-                        if item["unitPrice"] < lowest_price["unitPrice"]:
-                            lowest_price = item
+                        if item["unitPrice"] < lowest_price_item["unitPrice"]:
+                            lowest_price_item = item
+                    enchantStr = f"+{int(lowest_price_item["gameItemConditions"][0]["value"])}" if int(lowest_price_item["gameItemConditions"][0]["value"])>0 else ""
                     line_bot_api = MessagingApi(api_client)
                     line_bot_api.reply_message_with_http_info(
                         ReplyMessageRequest(
                             reply_token=event.reply_token,
-                            messages=[TextMessage(text=f'最低價格：\n伺服器：{lowest_price["gameServerName"]} \n單位價格：{lowest_price["unitPrice"]}')]
+                            messages=[TextMessage(text=f'{enchantStr}{lowest_price_item["gameItemName"]}最低單位價格：{lowest_price_item["unitPrice"]}\n伺服器：{lowest_price_item["gameServerName"]}')]
                         )
                     )
                 else:
