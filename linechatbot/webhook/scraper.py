@@ -40,11 +40,16 @@ def getLinwItems():
 def linwGoodsSearch(gameItemName, enchantValues, serverName):
     if serverName != "":
         servers = getLinwServers()
-        serverId = [i["serverID"] for i in servers if serverName == i["serverName"]][0]
-        print(f"Sever name {serverName} in incoming text. Get serverId: {serverId}")
+        if any([i["serverID"] for i in servers if serverName == i["serverName"]]):
+            print(f"Sever name {serverName} valid")
+        else:
+            print(f"Sever name {serverName} invalid")
+            return { "status_code": 303, "status_text": f"錯誤: 找不到伺服器名稱 {serverName}" }
     else:
         #serverIds is empty
-        serverId = "99999"
+        print("Sever name is empty")
+    
+    serverId = "99999"
     
     items = getLinwItems()
     match_list = [i["itemID"] for i in items if gameItemName in i["itemName"]]
@@ -68,8 +73,12 @@ def linwGoodsSearch(gameItemName, enchantValues, serverName):
         #request success
         print("Success: Data is successfully scraped")
         if data["data"]["empty"]:
+            #search success, but no item on the shelf
             return { "status_code": 500, "status_text": "查詢成功: 架上暫無此物品" }
         else:
+            #search success, and there are items on the shelf
+            #replace the data["data"]["content"] with the items that match the serverName
+            data["data"]["content"] = [items for items in data["data"]["content"] if items["gameServerName"] == serverName]
             return { "status_code": response.status_code, "status_text": "查詢成功", "data_count": len(data["data"]["content"]), "data": data["data"]["content"] }
         
     elif response.status_code == 429:
