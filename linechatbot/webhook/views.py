@@ -337,7 +337,7 @@ def handle_message(event):
                 print(f'=============Log=============\nSearch item message received: {text}')
                 searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9", "")
                 processSearchResultAndReplyMsg(text, searchResult, event, api_client)
-            elif re.match(r'^查詢物價 [\u4e00-\u9fa5]+ [\u4e00-\u9fa5]+$', text):
+            elif re.match(r'^查詢物價 [\u4e00-\u9fa5]+ [\u4e00-\u9fa5]+\d{0,2}$', text):
                 print(f'=============Log=============\nSearch item message received: {text}')
                 searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9", text.split(' ')[2])
                 processSearchResultAndReplyMsg(text, searchResult, event, api_client)
