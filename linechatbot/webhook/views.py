@@ -323,7 +323,7 @@ def handle_message(event):
                     line_bot_api.reply_message_with_http_info(
                         ReplyMessageRequest(
                             reply_token=event.reply_token,
-                            messages=[TextMessage(text=f'{enchantStr}{lowest_price_item["gameItemName"]}最低單位價格：{lowest_price_item["unitPrice"]}\n伺服器：{lowest_price_item["gameServerName"]}')]
+                            messages=[TextMessage(text=f'查詢成功 - 最低價位物品：\n{enchantStr}{lowest_price_item["gameItemName"]}\n最低單位價格：{lowest_price_item["unitPrice"]}\n伺服器：{lowest_price_item["gameServerName"]}')]
                         )
                     )
                 else:
