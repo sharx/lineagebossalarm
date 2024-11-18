@@ -80,10 +80,13 @@ def linwGoodsSearch(gameItemName, enchantValues, serverName):
         else:
             #search success, and there are items on the shelf
             #replace the data["data"]["content"] with the items that match the serverName
-            if server_valid:
+            if server_valid and any([items for items in data["data"]["content"] if items["gameServerName"] == serverName]):
                 data["data"]["content"] = [items for items in data["data"]["content"] if items["gameServerName"] == serverName]
-            return { "status_code": response.status_code, "status_text": "查詢成功", "data_count": len(data["data"]["content"]), "data": data["data"]["content"] }
-        
+                return { "status_code": response.status_code, "status_text": "查詢成功", "data_count": len(data["data"]["content"]), "data": data["data"]["content"] }
+            elif server_valid and not any([items for items in data["data"]["content"] if items["gameServerName"] == serverName]):
+                return { "status_code": 500, "status_text": "{serverName}交易所無此物品 {gameItemName}", "data_count": len(data["data"]["content"]), "data": data["data"]["content"] }
+            else:
+                return { "status_code": response.status_code, "status_text": "查詢成功", "data_count": len(data["data"]["content"]), "data": data["data"]["content"] }
     elif response.status_code == 429:
         #too many requests
         print("Error: Authentication session is not available. Too many requests")
