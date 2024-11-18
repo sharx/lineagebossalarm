@@ -241,6 +241,32 @@ def processRegisterKillTime(request_kill_time):
         kill_time = datetime.now().replace(second=0, microsecond=0)
     return kill_time
 
+def processSearchResultAndReplyMsg(text, searchResult, event, api_client):
+    searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9")
+    #find the lowest "unitPrice" and return the "gameServerName" and "unitPrice"
+    if searchResult["status_text"] == "查詢成功":
+        data = searchResult["data"]
+        lowest_price_item = data[0]
+        for item in data:
+            if item["unitPrice"] < lowest_price_item["unitPrice"]:
+                lowest_price_item = item
+        enchantStr = "+"+str(lowest_price_item["gameItemConditions"][0]["value"]) if int(lowest_price_item["gameItemConditions"][0]["value"])>0 else ""
+        line_bot_api = MessagingApi(api_client)
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=f'查詢成功 - 最低價位物品：\n{enchantStr}{lowest_price_item["gameItemName"]}\n最低單位價格：{lowest_price_item["unitPrice"]}\n伺服器：{lowest_price_item["gameServerName"]}')]
+            )
+        )
+    else:
+        err_msg = searchResult["status_text"]
+        line_bot_api = MessagingApi(api_client)
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=err_msg)]
+            )
+        )
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
     with ApiClient(configuration) as api_client:
@@ -310,31 +336,16 @@ def handle_message(event):
         elif re.match(r'^查詢物價', text):
             if re.match(r'^查詢物價 [\u4e00-\u9fa5]+$', text):
                 print(f'=============Log=============\nSearch item message received: {text}')
-                searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9")
-                #find the lowest "unitPrice" and return the "gameServerName" and "unitPrice"
-                if searchResult["status_text"] == "查詢成功":
-                    data = searchResult["data"]
-                    lowest_price_item = data[0]
-                    for item in data:
-                        if item["unitPrice"] < lowest_price_item["unitPrice"]:
-                            lowest_price_item = item
-                    enchantStr = "+"+str(lowest_price_item["gameItemConditions"][0]["value"]) if int(lowest_price_item["gameItemConditions"][0]["value"])>0 else ""
-                    line_bot_api = MessagingApi(api_client)
-                    line_bot_api.reply_message_with_http_info(
-                        ReplyMessageRequest(
-                            reply_token=event.reply_token,
-                            messages=[TextMessage(text=f'查詢成功 - 最低價位物品：\n{enchantStr}{lowest_price_item["gameItemName"]}\n最低單位價格：{lowest_price_item["unitPrice"]}\n伺服器：{lowest_price_item["gameServerName"]}')]
-                        )
-                    )
-                else:
-                    err_msg = searchResult["status_text"]
-                    line_bot_api = MessagingApi(api_client)
-                    line_bot_api.reply_message_with_http_info(
-                        ReplyMessageRequest(
-                            reply_token=event.reply_token,
-                            messages=[TextMessage(text=err_msg)]
-                        )
-                    )
+                searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9", "")
+                processSearchResultAndReplyMsg(text, searchResult, event, api_client)
+            elif re.match(r'^查詢物價 [\u4e00-\u9fa5]+ [\u4e00-\u9fa5]+$', text):
+                print(f'=============Log=============\nSearch item message received: {text}')
+                searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9", text.split(' ')[2])
+                processSearchResultAndReplyMsg(text, searchResult, event, api_client)
+            else:
+                print('=============Log=============\nMessage text is not in the correct goods search format')
+                print('Message text: ', text)
+                return JsonResponse({'status': 'false'}, status=405)
         else:
             print('=============Log=============\nMessage text is empty')
             #return a json response, status code 200
