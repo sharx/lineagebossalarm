@@ -318,7 +318,7 @@ def handle_message(event):
                     for item in data:
                         if item["unitPrice"] < lowest_price_item["unitPrice"]:
                             lowest_price_item = item
-                    enchantStr = f"+{int(lowest_price_item["gameItemConditions"][0]["value"])}" if int(lowest_price_item["gameItemConditions"][0]["value"])>0 else ""
+                    enchantStr = "+"+str(lowest_price_item["gameItemConditions"][0]["value"]) if int(lowest_price_item["gameItemConditions"][0]["value"])>0 else ""
                     line_bot_api = MessagingApi(api_client)
                     line_bot_api.reply_message_with_http_info(
                         ReplyMessageRequest(
