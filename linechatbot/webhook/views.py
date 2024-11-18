@@ -242,7 +242,6 @@ def processRegisterKillTime(request_kill_time):
     return kill_time
 
 def processSearchResultAndReplyMsg(text, searchResult, event, api_client):
-    searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9")
     #find the lowest "unitPrice" and return the "gameServerName" and "unitPrice"
     if searchResult["status_text"] == "查詢成功":
         data = searchResult["data"]
