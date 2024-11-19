@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q, F
 from .models import Boss, LineGroup, KillRecord
-from .scraper import linwGoodsSearch
+from .scraper import linwGoodsSearch, getLinwServers, getLinwItems
 from pprint import pprint
 
 from linebot.v3 import (
@@ -333,16 +333,73 @@ def handle_message(event):
             )
             pass
         elif re.match(r'^查詢物價', text):
-            if re.match(r'^查詢物價 [\u4e00-\u9fa5]+$', text):
-                print(f'=============Log=============\nSearch item message received: {text}')
-                searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9", "")
-                processSearchResultAndReplyMsg(text, searchResult, event, api_client)
-            elif re.match(r'^查詢物價 [\u4e00-\u9fa5]+ [\u4e00-\u9fa5]+\d{0,2}$', text):
-                print(f'=============Log=============\nSearch item message received: {text}')
-                searchResult = linwGoodsSearch(text.split(' ')[1], "0,+5,+7,+9", text.split(' ')[2])
-                processSearchResultAndReplyMsg(text, searchResult, event, api_client)
+            print(f'=============Log=============\nSearch item message received: {text}')
+            servers = getLinwServers()
+            gameItems = getLinwItems()
+            #阿修傳說咒語書選擇箱Ⅲ
+            text_suffix = text.replace('查詢物價 ', '')
+            if len(text_suffix.split(' ')) > 1:
+                # if the text is in the format '查詢物價 物品名稱 ???'
+                # examine if ??? is a valid server name. 
+                # if valid, then search the item with the serverId
+                # if invalid, then search the item with serverId "99999"
+                
+                for server in servers:
+                    if text_suffix.split(' ')[-1] == server["gameServerName"] or text_suffix.split(' ')[-1] == server["gameServerShortName"]:
+                        serverName_valid = True
+                        gameServerName = text_suffix.split(' ')[-1]
+                        gameServerId = server["gameServerId"]
+                        break
+                    else:
+                        serverName_valid = False
+                for gameItem in gameItems:
+                    if text_suffix[:text_suffix.rfind(' ')] == gameItem["gameItemName"]:
+                        gameItemName_valid = True
+                        gameItemID = gameItem["gameItemID"]
+                        gameItemName = gameItem["gameItemName"]
+                        break
+                    else:
+                        gameItemName_valid = False
+
+                if serverName_valid and gameItemName_valid:
+                    print('=============Log=============\nServer name and gameItemName_valid is valid')
+                    gameItemName = text_suffix[:text_suffix.rfind(' ')]
+                    searchResult = linwGoodsSearch(gameItemID, gameItemName, gameServerName)
+                    processSearchResultAndReplyMsg(text, searchResult, event, api_client)
+                elif not serverName_valid:
+                    print('=============Log=============\nServer name is invalid')
+                    searchResult = { "status_code": 404, "status_text": f"錯誤: 找不到伺服器 {gameServerName}" }
+                    processSearchResultAndReplyMsg(text, searchResult, event, api_client)
+                elif not gameItemName_valid:
+                    print('=============Log=============\nGameItemName is invalid')
+                    searchResult = { "status_code": 404, "status_text": f"錯誤: 找不到物品名稱 {gameItemName}" }
+                    processSearchResultAndReplyMsg(text, searchResult, event, api_client)
+                else:
+                    print('=============Log=============\nMessage text is not in the correct goods search format. pinpoint 1')
+                    print('Message text: ', text)
+                    return JsonResponse({'status': 'false'}, status=405)
+            elif len(text_suffix.split(' ')) == 1:
+                # if the text is in the format '查詢物價 物品名稱'
+                # search the item with serverId "99999"
+                for gameItem in gameItems:
+                    if text_suffix == gameItem["gameItemName"]:
+                        gameItemName_valid = True
+                        gameItemID = gameItem["gameItemID"]
+                        gameItemName = gameItem["gameItemName"]
+                        break
+                    else:
+                        gameItemName_valid = False
+                if gameItemName_valid:
+                    print('=============Log=============\nServer name and gameItemName_valid is valid')
+                    searchResult = linwGoodsSearch(gameItemID, gameItemName, "")
+                    processSearchResultAndReplyMsg(text, searchResult, event, api_client)
+                else:
+                    print('=============Log=============\nGameItemName is invalid')
+                    searchResult = { "status_code": 404, "status_text": f"錯誤: 找不到物品名稱 {gameItemName}" }
+                    processSearchResultAndReplyMsg(text, searchResult, event, api_client)
+                
             else:
-                print('=============Log=============\nMessage text is not in the correct goods search format')
+                print('=============Log=============\nMessage text is not in the correct goods search format. pinpoint 2')
                 print('Message text: ', text)
                 return JsonResponse({'status': 'false'}, status=405)
         else:
