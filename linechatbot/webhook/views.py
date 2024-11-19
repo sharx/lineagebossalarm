@@ -263,7 +263,7 @@ def processSearchResultAndReplyMsg(text, searchResult, event, api_client):
         gameItemNames = [item["gameItemName"] for item in gameItems]
         targetItemName = searchResult["status_text"].replace("錯誤: 找不到物品名稱 ", "")
         possibleItemNames = [item for item in gameItemNames if targetItemName in item]
-        replyText = f'{searchResult["status_text"]}\錯誤: 找不到物品名稱\n{enteredItemName}'
+        replyText = f'錯誤: 找不到物品名稱\n{enteredItemName}'
         replyText += f'\n可能的物品名稱：'
         for item in possibleItemNames:
             replyText += f'\n{item}'
