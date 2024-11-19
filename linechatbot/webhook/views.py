@@ -258,16 +258,16 @@ def processSearchResultAndReplyMsg(text, searchResult, event, api_client):
             )
         )
     elif searchResult["status_text"].startswith("錯誤: 找不到物品名稱"):
-        """
+        enteredItemName = searchResult["status_text"][:searchResult["status_text"].rfind(" ")]
         gameItems = searchResult["gameItems"]
         gameItemNames = [item["gameItemName"] for item in gameItems]
         targetItemName = searchResult["status_text"].replace("錯誤: 找不到物品名稱 ", "")
         possibleItemNames = [item for item in gameItemNames if targetItemName in item]
-        replyText = f'{searchResult["status_text"]}\錯誤: 找不到物品名稱\n{gameItemNames}'
+        replyText = f'{searchResult["status_text"]}\錯誤: 找不到物品名稱\n{enteredItemName}'
         replyText += f'\n可能的物品名稱：'
         for item in possibleItemNames:
             replyText += f'\n{item}'
-        """
+        
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
