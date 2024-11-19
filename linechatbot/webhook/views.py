@@ -411,7 +411,7 @@ def handle_message(event):
                     processSearchResultAndReplyMsg(text, searchResult, event, api_client)
                 else:
                     print('=============Log=============\nGameItemName is invalid')
-                    searchResult = { "status_code": 404, "status_text": f"錯誤: 找不到物品名稱 {gameItemName}", "gameItems": gameItems }
+                    searchResult = { "status_code": 404, "status_text": f"錯誤: 找不到物品名稱 {text_suffix}", "gameItems": gameItems }
                     processSearchResultAndReplyMsg(text, searchResult, event, api_client)
                 
             else:
