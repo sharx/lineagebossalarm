@@ -272,7 +272,7 @@ def processSearchResultAndReplyMsg(text, searchResult, event, api_client):
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text=searchResult["status_text"])]
+                messages=[TextMessage(text=replyText)]
             )
         )
     else:
