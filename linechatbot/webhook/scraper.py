@@ -18,7 +18,7 @@ def getLinwServers():
             servers.append({"serverID": str(server["gameServerId"]), "serverName": server["gameServerName"]})
         return servers
         """
-        return data
+        return data["data"]
     else:
         #error
         print("Error: Cannot get server list")
@@ -53,7 +53,7 @@ def getLinwItems():
             items.append({"itemID": str(item["id"]), "itemName": item["gameItemName"]})
         return items
         """
-        return data
+        return data["data"]
     else:
         #error
         print("Error: Cannot get item list")
