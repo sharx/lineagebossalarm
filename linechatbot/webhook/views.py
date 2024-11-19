@@ -371,7 +371,7 @@ def handle_message(event):
                 for gameItem in gameItems:
                     if text_suffix[:text_suffix.rfind(' ')] == gameItem["gameItemName"]:
                         gameItemName_valid = True
-                        gameItemID = gameItem["gameItemID"]
+                        gameItemID = gameItem["id"]
                         gameItemName = gameItem["gameItemName"]
                         break
                     else:
@@ -400,7 +400,7 @@ def handle_message(event):
                 for gameItem in gameItems:
                     if text_suffix == gameItem["gameItemName"]:
                         gameItemName_valid = True
-                        gameItemID = gameItem["gameItemID"]
+                        gameItemID = gameItem["id"]
                         gameItemName = gameItem["gameItemName"]
                         break
                     else:
