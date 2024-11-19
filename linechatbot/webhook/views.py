@@ -257,6 +257,22 @@ def processSearchResultAndReplyMsg(text, searchResult, event, api_client):
                 messages=[TextMessage(text=f'查詢成功 - 最低價位物品：\n{enchantStr}{lowest_price_item["gameItemName"]}\n最低單位價格：{lowest_price_item["unitPrice"]}\n伺服器：{lowest_price_item["gameServerName"]}')]
             )
         )
+    elif searchResult["status_text"].startswith("錯誤: 找不到物品名稱"):
+        gameItems = searchResult["gameItems"]
+        gameItemNames = [item["gameItemName"] for item in gameItems]
+        targetItemName = searchResult["status_text"].replace("錯誤: 找不到物品名稱 ", "")
+        possibleItemNames = [item for item in gameItemNames if targetItemName in item]
+        replyText = f'{searchResult["status_text"]}\錯誤: 找不到物品名稱\n{gameItemNames}'
+        replyText += f'\n可能的物品名稱：'
+        for item in possibleItemNames:
+            replyText += f'\n{item}'
+        line_bot_api = MessagingApi(api_client)
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=replyText)]
+            )
+        )
     else:
         err_msg = searchResult["status_text"]
         line_bot_api = MessagingApi(api_client)
@@ -395,7 +411,7 @@ def handle_message(event):
                     processSearchResultAndReplyMsg(text, searchResult, event, api_client)
                 else:
                     print('=============Log=============\nGameItemName is invalid')
-                    searchResult = { "status_code": 404, "status_text": f"錯誤: 找不到物品名稱 {gameItemName}" }
+                    searchResult = { "status_code": 404, "status_text": f"錯誤: 找不到物品名稱 {gameItemName}", "gameItems": gameItems }
                     processSearchResultAndReplyMsg(text, searchResult, event, api_client)
                 
             else:
