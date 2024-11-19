@@ -398,7 +398,6 @@ def handle_message(event):
                 # if the text is in the format '查詢物價 物品名稱'
                 # search the item with serverId "99999"
                 for gameItem in gameItems:
-                    print(f"gameItem: {gameItem}")
                     if text_suffix == gameItem["gameItemName"]:
                         gameItemName_valid = True
                         gameItemID = gameItem["gameItemID"]
